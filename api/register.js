@@ -4,8 +4,11 @@ const bcrypt = require("bcryptjs");
 let isConnected = false;
 async function connectDB() {
   if (isConnected) return;
-  if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI is not set");
-  const db = await mongoose.connect(process.env.MONGODB_URI);
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    throw new Error("MONGODB_URI is not set in environment variables");
+  }
+  const db = await mongoose.connect(uri);
   isConnected = db.connections[0].readyState;
 }
 
@@ -31,7 +34,15 @@ module.exports = async (req, res) => {
 
   try {
     await connectDB();
-    const { name, email, password } = req.body;
+
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {}
+    }
+
+    const { name, email, password } = body || {};
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required." });
@@ -52,6 +63,6 @@ module.exports = async (req, res) => {
     return res.status(201).json({ message: "Registration successful." });
   } catch (error) {
     console.error("Registration error:", error);
-    return res.status(500).json({ message: "Server error." });
+    return res.status(500).json({ message: "Server error: " + (error.message || error) });
   }
 };
