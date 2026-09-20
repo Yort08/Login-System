@@ -4,15 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Welcome to the Dashboard</h1>
-
-    <p>You have successfully logged in.</p>
-
-    <button onclick="logout()">Logout</button>
+    <div class="container">
+      <h2>Dashboard</h2>
+      <p id="welcome">Loading user info...</p>
+      <button onclick="logout()">Logout</button>
+    </div>
 
     <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "index.html";
+      }
+
+      fetch("/api/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Unauthorized");
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById("welcome").innerHTML = `<strong>Welcome,</strong> ${data.user.name}!<br><small style="color: #666;">${data.user.email}</small>`;
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+      });
+
       function logout() {
         localStorage.removeItem("token");
         window.location.href = "index.html";
