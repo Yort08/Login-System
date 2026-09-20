@@ -1,4 +1,4 @@
-﻿// Since backend and frontend are hosted together on Vercel, API_URL is relative (no CORS!)
+// Since backend and frontend are hosted together on Vercel, API_URL is relative (no CORS!)
 const API_URL = "";
 
 async function register() {
