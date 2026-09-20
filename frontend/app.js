@@ -1,73 +1,116 @@
-// Since backend and frontend are hosted together on Vercel, API_URL is relative (no CORS!)
 const API_URL = "";
 
+function toggleAuth(showRegister) {
+  const loginView = document.getElementById("loginView");
+  const registerView = document.getElementById("registerView");
+  const loginMsg = document.getElementById("loginMessage");
+  const regMsg = document.getElementById("registerMessage");
+
+  if (loginMsg) loginMsg.textContent = "";
+  if (regMsg) regMsg.textContent = "";
+
+  if (showRegister) {
+    loginView.classList.add("hidden");
+    registerView.classList.remove("hidden");
+  } else {
+    registerView.classList.add("hidden");
+    loginView.classList.remove("hidden");
+  }
+}
+
 async function register() {
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const password = document.getElementById("regPassword").value;
+  const message = document.getElementById("registerMessage");
+  const btn = document.getElementById("registerBtn");
 
   if (!name || !email || !password) {
-    document.getElementById("message").innerText = "Please fill in all fields.";
+    message.textContent = "Please fill in all fields.";
+    message.style.color = "#ef4444";
     return;
   }
 
-  document.getElementById("message").innerText = "Creating account...";
+  message.textContent = "Creating account...";
+  message.style.color = "#64748b";
+  btn.disabled = true;
 
   try {
     const response = await fetch(`${API_URL}/api/register`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
     });
 
     const data = await response.json();
 
-    document.getElementById("message").innerText =
-      data.message || "Registration complete";
+    if (!response.ok) {
+      message.textContent = data.message || "Registration failed.";
+      message.style.color = "#ef4444";
+      btn.disabled = false;
+      return;
+    }
+
+    message.textContent = "Registration successful! Redirecting to sign in...";
+    message.style.color = "#10b981";
+
+    setTimeout(() => {
+      document.getElementById("registerForm").reset();
+      toggleAuth(false);
+      const loginEmail = document.getElementById("email");
+      if (loginEmail) loginEmail.value = email;
+      const loginMsg = document.getElementById("loginMessage");
+      if (loginMsg) {
+        loginMsg.textContent = "Account created. You can now sign in.";
+        loginMsg.style.color = "#10b981";
+      }
+      btn.disabled = false;
+    }, 1200);
   } catch (error) {
-    document.getElementById("message").innerText = "Cannot connect to server";
+    message.textContent = "Cannot connect to server.";
+    message.style.color = "#ef4444";
+    btn.disabled = false;
   }
 }
 
 async function login() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
+  const message = document.getElementById("loginMessage");
+  const btn = document.getElementById("loginBtn");
 
   if (!email || !password) {
-    document.getElementById("message").innerText = "Please enter email and password.";
+    message.textContent = "Please enter email and password.";
+    message.style.color = "#ef4444";
     return;
   }
 
-  document.getElementById("message").innerText = "Logging in...";
+  message.textContent = "Signing in...";
+  message.style.color = "#64748b";
+  btn.disabled = true;
 
   try {
     const response = await fetch(`${API_URL}/api/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
 
     if (data.token) {
       localStorage.setItem("token", data.token);
+      message.textContent = "Sign in successful!";
+      message.style.color = "#10b981";
       window.location.href = "dashboard.html";
     } else {
-      document.getElementById("message").innerText =
-        data.message || "Login failed";
+      message.textContent = data.message || "Invalid email or password.";
+      message.style.color = "#ef4444";
+      btn.disabled = false;
     }
   } catch (error) {
-    document.getElementById("message").innerText = "Cannot connect to server";
+    message.textContent = "Cannot connect to server.";
+    message.style.color = "#ef4444";
+    btn.disabled = false;
   }
 }

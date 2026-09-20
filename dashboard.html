@@ -7,11 +7,17 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container">
-      <h2>Dashboard</h2>
-      <p id="welcome">Loading user info...</p>
-      <button onclick="logout()">Logout</button>
-    </div>
+    <main class="card">
+      <h1>Dashboard</h1>
+      <p class="subtitle">You have successfully signed in.</p>
+
+      <div class="user-badge">
+        <div id="welcomeName" class="user-name">Loading...</div>
+        <div id="welcomeEmail" class="user-email">Please wait</div>
+      </div>
+
+      <button onclick="logout()" class="btn-primary" style="margin-bottom: 0;">Logout</button>
+    </main>
 
     <script>
       const token = localStorage.getItem("token");
@@ -29,7 +35,8 @@
         return response.json();
       })
       .then(data => {
-        document.getElementById("welcome").innerHTML = `<strong>Welcome,</strong> ${data.user.name}!<br><small style="color: #666;">${data.user.email}</small>`;
+        document.getElementById("welcomeName").textContent = data.user.name;
+        document.getElementById("welcomeEmail").textContent = data.user.email;
       })
       .catch(() => {
         localStorage.removeItem("token");

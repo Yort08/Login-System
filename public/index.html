@@ -7,21 +7,62 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container">
-      <h2>Login</h2>
+    <main class="card">
+      <!-- Login View -->
+      <div id="loginView">
+        <h1>Welcome back</h1>
+        <p class="subtitle">Sign in to your account to continue.</p>
 
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
+        <form id="loginForm" onsubmit="event.preventDefault(); login();">
+          <div class="form-group">
+            <label for="email">EMAIL</label>
+            <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
+          </div>
 
-      <button onclick="login()">Login</button>
+          <div class="form-group">
+            <label for="password">PASSWORD</label>
+            <input type="password" id="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required autocomplete="current-password" />
+          </div>
 
-      <p>Don't have an account?</p>
+          <button type="submit" class="btn-primary" id="loginBtn">Sign In</button>
+        </form>
 
-      <input type="text" id="name" placeholder="Name" />
-      <button onclick="register()">Register</button>
+        <p class="footer-text">
+          Don't have an account? <a id="showRegisterLink" onclick="toggleAuth(true)">Register</a>
+        </p>
+        <p id="loginMessage" class="message"></p>
+      </div>
 
-      <p id="message"></p>
-    </div>
+      <!-- Register View -->
+      <div id="registerView" class="hidden">
+        <h1>Create account</h1>
+        <p class="subtitle">Sign up to get started.</p>
+
+        <form id="registerForm" onsubmit="event.preventDefault(); register();">
+          <div class="form-group">
+            <label for="regName">NAME</label>
+            <input type="text" id="regName" placeholder="Your full name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail">EMAIL</label>
+            <input type="email" id="regEmail" placeholder="you@example.com" required autocomplete="email" />
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">PASSWORD</label>
+            <input type="password" id="regPassword" placeholder="At least 6 characters" required autocomplete="new-password" />
+          </div>
+
+          <button type="submit" class="btn-primary" id="registerBtn">Create Account</button>
+        </form>
+
+        <p class="footer-text">
+          Already have an account? <a id="showLoginLink" onclick="toggleAuth(false)">Sign In</a>
+        </p>
+        <p id="registerMessage" class="message"></p>
+      </div>
+    </main>
 
     <script src="app.js"></script>
   </body>
